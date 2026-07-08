@@ -23,178 +23,260 @@
     --green:#6a9c6a;
     --line: rgba(241,234,217,0.14);
     --line-strong: rgba(241,234,217,0.28);
+    --ease: cubic-bezier(.22,1,.36,1);
+    --ease-spring: cubic-bezier(.34,1.56,.64,1);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
+  html{ scroll-behavior:smooth; }
   body{
     background: var(--ink);
     color: var(--paper);
     font-family:'Inter',sans-serif;
     min-height:100vh;
     -webkit-font-smoothing:antialiased;
+    position:relative;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:""; position:fixed; inset:-20%; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(201,162,75,0.10), transparent 45%),
+      radial-gradient(circle at 85% 75%, rgba(91,122,157,0.12), transparent 45%);
+    animation: bgDrift 26s ease-in-out infinite alternate;
+  }
+  @keyframes bgDrift{
+    0%{ transform: translate(0,0) scale(1); }
+    100%{ transform: translate(2%,-3%) scale(1.06); }
   }
   ::selection{ background: var(--gold); color:var(--ink); }
-  .app{max-width:780px; margin:0 auto; padding:28px 18px 80px;}
+  .app{max-width:780px; margin:0 auto; padding:28px 18px 80px; position:relative; z-index:1; animation: fadeSlideUp 0.5s var(--ease) both;}
+
+  @keyframes fadeSlideUp{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes scalePop{ 0%{ transform:scale(0.6); } 60%{ transform:scale(1.15); } 100%{ transform:scale(1); } }
+  @keyframes checkPop{ 0%{ transform:scale(1); } 40%{ transform:scale(1.25); } 100%{ transform:scale(1); } }
+  @keyframes shimmerGlow{ 0%,100%{ box-shadow:0 0 0 rgba(201,162,75,0); } 50%{ box-shadow:0 0 22px rgba(201,162,75,0.35); } }
+  @keyframes confettiFall{
+    0%{ transform:translateY(0) rotate(0deg); opacity:1; }
+    100%{ transform:translateY(120px) rotate(360deg); opacity:0; }
+  }
+  @keyframes flashText{ from{ opacity:0; transform:translateY(-3px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes ringDraw{ from{ stroke-dashoffset: var(--ring-c, 63); } }
 
   .eyebrow{
     font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.18em;
     text-transform:uppercase; color: var(--gold); margin:0 0 6px;
+    animation: fadeSlideUp 0.5s var(--ease) both;
   }
   h1{
     font-family:'Source Serif 4', serif; font-weight:600; font-size:clamp(24px,6vw,32px);
     margin:0 0 4px; letter-spacing:-0.01em;
+    animation: fadeSlideUp 0.55s var(--ease) both 0.03s;
   }
-  .sub{ color: rgba(241,234,217,0.55); font-size:13.5px; margin:0 0 18px; line-height:1.5; }
+  .sub{ color: rgba(241,234,217,0.55); font-size:13.5px; margin:0 0 18px; line-height:1.5; animation: fadeSlideUp 0.55s var(--ease) both 0.06s; }
 
-  .sync-row{ display:flex; align-items:center; gap:8px; margin-bottom:18px; }
-  .sync-dot{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
-  .sync-dot.synced{ background: var(--green); }
+  .sync-row{ display:flex; align-items:center; gap:8px; margin-bottom:18px; animation: fadeIn 0.6s var(--ease) both 0.1s; }
+  .sync-dot{ width:7px; height:7px; border-radius:50%; flex-shrink:0; transition: background 0.3s var(--ease); }
+  .sync-dot.synced{ background: var(--green); animation: scalePop 0.4s var(--ease-spring); }
   .sync-dot.saving{ background: var(--gold); animation: pulse 1s infinite; }
   .sync-dot.error{ background: var(--rust); }
   .sync-dot.loading{ background: rgba(241,234,217,0.35); }
   @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.3;} }
-  .sync-text{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:rgba(241,234,217,0.45); }
+  .sync-text{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:rgba(241,234,217,0.45); transition: color 0.3s; }
   .sync-text.error{ color: var(--rust); }
   .retry-btn{
     margin-left:auto; font-family:'IBM Plex Mono', monospace; font-size:11px; color: var(--gold);
     background:none; border:1px solid var(--line-strong); border-radius:20px; padding:4px 10px; cursor:pointer;
+    transition: transform 0.15s var(--ease), background 0.2s;
   }
+  .retry-btn:hover{ background: rgba(201,162,75,0.1); }
+  .retry-btn:active{ transform: scale(0.94); }
 
   /* Total tracker (all subjects) */
   .total-tracker{
-    border:1px solid var(--gold); border-radius:2px; padding:18px; margin-bottom:20px; position:relative; overflow:hidden;
+    border:1px solid var(--gold); border-radius:6px; padding:18px; margin-bottom:20px; position:relative; overflow:hidden;
     background: linear-gradient(180deg, rgba(201,162,75,0.08), transparent);
+    animation: fadeSlideUp 0.5s var(--ease) both 0.12s;
+    transition: box-shadow 0.4s;
   }
+  .total-tracker.complete{ animation: fadeSlideUp 0.5s var(--ease) both 0.12s, shimmerGlow 2.2s ease-in-out infinite; }
   .total-tracker .instrument-row{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
   .total-label{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin:0 0 10px; }
   .total-pct{ font-family:'IBM Plex Mono', monospace; font-size:36px; font-weight:600; line-height:1; }
   .total-pct span{ font-size:15px; color:rgba(241,234,217,0.5); font-weight:400; }
   .total-meta{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:rgba(241,234,217,0.5); text-align:right; }
   .mini-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap:6px; margin-top:14px; }
-  .mini-subject{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:rgba(241,234,217,0.55); border:1px solid var(--line); border-radius:2px; padding:6px 8px; cursor:pointer; }
-  .mini-subject:hover{ border-color: var(--line-strong); }
+  .mini-subject{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:rgba(241,234,217,0.55); border:1px solid var(--line); border-radius:4px; padding:6px 8px; cursor:pointer; transition: border-color 0.2s var(--ease), transform 0.15s var(--ease), color 0.2s; }
+  .mini-subject:hover{ border-color: var(--line-strong); transform: translateY(-1px); }
+  .mini-subject:active{ transform: scale(0.97); }
   .mini-subject.current{ border-color: var(--gold); color: var(--gold); }
   .mini-subject-name{ display:block; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .mini-track{ height:3px; background:rgba(241,234,217,0.12); border-radius:2px; overflow:hidden; }
-  .mini-fill{ height:100%; background: var(--gold); }
+  .mini-fill{ height:100%; background: var(--gold); transition: width 0.6s var(--ease); }
 
-  .subjects{ display:flex; gap:8px; margin-bottom:18px; overflow-x:auto; padding-bottom:2px; }
+  .subjects{ display:flex; gap:8px; margin-bottom:18px; overflow-x:auto; padding-bottom:2px; animation: fadeSlideUp 0.5s var(--ease) both 0.16s; }
   .subject-pill{
     font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.03em; padding:8px 14px;
     border:1px solid var(--line-strong); border-radius:20px; color:rgba(241,234,217,0.55); cursor:pointer;
-    white-space:nowrap; flex-shrink:0; background:transparent; transition: all 0.15s;
+    white-space:nowrap; flex-shrink:0; background:transparent; transition: all 0.2s var(--ease);
   }
+  .subject-pill:hover{ border-color: rgba(241,234,217,0.45); transform: translateY(-1px); }
+  .subject-pill:active{ transform: scale(0.96); }
   .subject-pill.active{ background:rgba(201,162,75,0.14); border-color:var(--gold); color:var(--gold); }
   .subject-pill .p{ opacity:0.6; margin-left:6px; }
 
-  .instrument{ border:1px solid var(--line-strong); border-radius:2px; padding:18px 18px 16px; margin-bottom:18px; position:relative; overflow:hidden; }
+  .instrument{ border:1px solid var(--line-strong); border-radius:6px; padding:18px 18px 16px; margin-bottom:18px; position:relative; overflow:hidden; animation: fadeSlideUp 0.5s var(--ease) both 0.05s; }
   .instrument::before{ content:""; position:absolute; inset:0; background: repeating-linear-gradient(90deg, var(--line) 0px, var(--line) 1px, transparent 1px, transparent 24px); opacity:0.5; pointer-events:none; }
   .instrument-row{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; position:relative; }
-  .instrument-pct{ font-family:'IBM Plex Mono', monospace; font-size:38px; font-weight:600; color: var(--paper); line-height:1; }
+  .instrument-pct{ font-family:'IBM Plex Mono', monospace; font-size:38px; font-weight:600; color: var(--paper); line-height:1; font-variant-numeric: tabular-nums; }
   .instrument-pct span{ font-size:16px; color:rgba(241,234,217,0.5); font-weight:400; }
   .instrument-meta{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:rgba(241,234,217,0.55); text-align:right; }
   .track{ height:6px; background:rgba(241,234,217,0.1); border-radius:3px; margin-top:14px; overflow:hidden; position:relative; }
-  .track-fill{ height:100%; background: linear-gradient(90deg, var(--slate), var(--gold)); border-radius:3px; transition: width 0.5s ease; }
+  .track-fill{ height:100%; background: linear-gradient(90deg, var(--slate), var(--gold)); border-radius:3px; transition: width 0.7s var(--ease); position:relative; overflow:hidden; }
+  .track-fill::after{
+    content:""; position:absolute; inset:0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+    width:40%; animation: trackShine 2.6s ease-in-out infinite;
+  }
+  @keyframes trackShine{ 0%{ transform: translateX(-120%); } 100%{ transform: translateX(340%); } }
 
-  .tabs{ display:flex; gap:2px; margin-bottom:16px; border:1px solid var(--line-strong); border-radius:2px; overflow:hidden; }
-  .tab{ flex:1; text-align:center; padding:11px 10px; cursor:pointer; font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:rgba(241,234,217,0.5); background:transparent; border:none; transition: color 0.2s, background 0.2s; }
+  .tabs{ display:flex; gap:2px; margin-bottom:16px; border:1px solid var(--line-strong); border-radius:6px; overflow:hidden; animation: fadeSlideUp 0.5s var(--ease) both 0.08s; }
+  .tab{ flex:1; text-align:center; padding:11px 10px; cursor:pointer; font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:rgba(241,234,217,0.5); background:transparent; border:none; transition: color 0.2s, background 0.3s var(--ease); position:relative; }
   .tab.active{ background:rgba(201,162,75,0.14); color:var(--gold); }
   .tab:not(.active):hover{ color:var(--paper); }
+  .tab:active{ transform: scale(0.98); }
 
   .edit-toggle-row{ display:flex; justify-content:flex-end; margin-bottom:12px; }
   .edit-toggle{
     font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.05em; text-transform:uppercase;
     color: rgba(241,234,217,0.5); background:none; border:1px solid var(--line-strong); border-radius:20px;
-    padding:6px 14px; cursor:pointer; display:flex; align-items:center; gap:6px;
+    padding:6px 14px; cursor:pointer; display:flex; align-items:center; gap:6px; transition: all 0.2s var(--ease);
   }
+  .edit-toggle:hover{ border-color: rgba(241,234,217,0.45); }
+  .edit-toggle:active{ transform: scale(0.96); }
   .edit-toggle.on{ color: var(--gold); border-color: var(--gold); background: rgba(201,162,75,0.1); }
 
-  .module{ border:1px solid var(--line-strong); border-radius:2px; margin-bottom:12px; overflow:hidden; }
-  .module-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 16px; cursor:pointer; user-select:none; }
+  .module{
+    border:1px solid var(--line-strong); border-radius:6px; margin-bottom:12px; overflow:hidden;
+    animation: fadeSlideUp 0.4s var(--ease) both; animation-delay: calc(var(--i, 0) * 45ms);
+    transition: border-color 0.25s var(--ease), transform 0.2s var(--ease);
+  }
+  .module:hover{ border-color: rgba(241,234,217,0.4); }
+  .module-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 16px; cursor:pointer; user-select:none; transition: background 0.2s; }
   .module-head:hover{ background: rgba(241,234,217,0.03); }
   .module-title{ display:flex; align-items:baseline; gap:10px; flex:1; min-width:0; }
   .module-name{ font-family:'Source Serif 4', serif; font-size:17px; font-weight:600; }
   .module-name-input{
     font-family:'Source Serif 4', serif; font-size:16px; font-weight:600; background:rgba(241,234,217,0.06);
-    border:1px solid var(--line-strong); border-radius:2px; color:var(--paper); padding:5px 8px; width:100%; max-width:320px;
+    border:1px solid var(--line-strong); border-radius:4px; color:var(--paper); padding:5px 8px; width:100%; max-width:320px;
+    transition: border-color 0.2s;
   }
+  .module-name-input:focus{ outline:none; border-color: var(--gold); }
   .module-stat{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:rgba(241,234,217,0.5); display:flex; align-items:center; gap:10px; flex-shrink:0; }
   .module-ring{ width:26px; height:26px; flex-shrink:0; }
-  .chev{ transition: transform 0.2s; opacity:0.5; font-size:11px; }
+  .ring-fill{ transition: stroke-dashoffset 0.7s var(--ease); }
+  .chev{ transition: transform 0.3s var(--ease); opacity:0.5; font-size:11px; }
   .module.open .chev{ transform: rotate(90deg); }
-  .module-body{ display:none; border-top:1px solid var(--line); }
-  .module.open .module-body{ display:block; }
+  .module-body-outer{ display:grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s var(--ease); }
+  .module.open .module-body-outer{ grid-template-rows: 1fr; }
+  .module-body{ overflow:hidden; min-height:0; border-top:1px solid var(--line); }
   .del-btn{
     font-family:'IBM Plex Mono', monospace; font-size:13px; color: var(--rust); background:none; border:none;
-    cursor:pointer; padding:2px 6px; opacity:0.7; flex-shrink:0;
+    cursor:pointer; padding:2px 6px; opacity:0.7; flex-shrink:0; transition: opacity 0.15s, transform 0.15s var(--ease);
   }
-  .del-btn:hover{ opacity:1; }
+  .del-btn:hover{ opacity:1; transform: scale(1.15); }
+  .del-btn:active{ transform: scale(0.9); }
 
-  .item{ display:flex; align-items:center; gap:12px; padding:11px 16px; border-bottom:1px solid var(--line); cursor:pointer; }
+  .item{ display:flex; align-items:center; gap:12px; padding:11px 16px; border-bottom:1px solid var(--line); cursor:pointer; transition: background 0.2s; }
   .item:last-child{ border-bottom:none; }
   .item:hover{ background: rgba(241,234,217,0.03); }
-  .box{ width:18px; height:18px; border:1.5px solid rgba(241,234,217,0.35); border-radius:3px; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition: all 0.15s; }
-  .box.checked{ background:var(--gold); border-color:var(--gold); }
-  .box.checked::after{ content:"✓"; color:var(--ink); font-size:12px; font-weight:700; }
-  .item-name{ flex:1; font-size:14px; line-height:1.4; }
+  .box{ width:18px; height:18px; border:1.5px solid rgba(241,234,217,0.35); border-radius:4px; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition: all 0.2s var(--ease-spring); }
+  .box.checked{ background:var(--gold); border-color:var(--gold); animation: checkPop 0.35s var(--ease-spring); }
+  .box.checked::after{ content:"✓"; color:var(--ink); font-size:12px; font-weight:700; animation: fadeIn 0.15s; }
+  .item-name{ flex:1; font-size:14px; line-height:1.4; transition: color 0.3s; }
   .item.done .item-name{ color:rgba(241,234,217,0.4); text-decoration:line-through; }
   .item-hrs{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:rgba(241,234,217,0.45); flex-shrink:0; }
   .item-name-input{
     flex:1; font-size:13.5px; background:rgba(241,234,217,0.06); border:1px solid var(--line-strong);
-    border-radius:2px; color:var(--paper); padding:6px 8px; font-family:'Inter',sans-serif;
+    border-radius:4px; color:var(--paper); padding:6px 8px; font-family:'Inter',sans-serif; transition: border-color 0.2s;
   }
+  .item-name-input:focus, .item-hrs-input:focus{ outline:none; border-color: var(--gold); }
   .item-hrs-input{
     width:56px; font-family:'IBM Plex Mono', monospace; font-size:12px; background:rgba(241,234,217,0.06);
-    border:1px solid var(--line-strong); border-radius:2px; color:var(--paper); padding:6px 6px; text-align:right;
+    border:1px solid var(--line-strong); border-radius:4px; color:var(--paper); padding:6px 6px; text-align:right; transition: border-color 0.2s;
   }
 
   .add-row{ display:flex; align-items:center; gap:8px; padding:11px 16px; border-top:1px dashed var(--line-strong); }
   .add-row input[type=text]{
     flex:1; font-size:13.5px; background:rgba(241,234,217,0.04); border:1px solid var(--line-strong);
-    border-radius:2px; color:var(--paper); padding:7px 9px; font-family:'Inter',sans-serif;
+    border-radius:4px; color:var(--paper); padding:7px 9px; font-family:'Inter',sans-serif; transition: border-color 0.2s;
   }
+  .add-row input:focus{ outline:none; border-color: var(--gold); }
   .add-row input[type=number]{
     width:64px; font-family:'IBM Plex Mono', monospace; font-size:12px; background:rgba(241,234,217,0.04);
-    border:1px solid var(--line-strong); border-radius:2px; color:var(--paper); padding:7px 6px; text-align:right;
+    border:1px solid var(--line-strong); border-radius:4px; color:var(--paper); padding:7px 6px; text-align:right; transition: border-color 0.2s;
   }
   .add-btn{
     font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.05em; text-transform:uppercase;
-    color:var(--ink); background:var(--gold); border:none; border-radius:2px; padding:7px 12px; cursor:pointer; flex-shrink:0;
+    color:var(--ink); background:var(--gold); border:none; border-radius:4px; padding:7px 12px; cursor:pointer; flex-shrink:0;
+    transition: transform 0.15s var(--ease-spring), opacity 0.2s;
   }
   .add-btn:hover{ opacity:0.9; }
-  .add-module-row{ padding:14px 16px; border:1px dashed var(--line-strong); border-radius:2px; display:flex; gap:8px; align-items:center; }
+  .add-btn:active{ transform: scale(0.93); }
+  .add-module-row{ padding:14px 16px; border:1px dashed var(--line-strong); border-radius:6px; display:flex; gap:8px; align-items:center; animation: fadeSlideUp 0.3s var(--ease) both; }
   .add-module-row input{
     flex:1; font-size:14px; background:rgba(241,234,217,0.04); border:1px solid var(--line-strong);
-    border-radius:2px; color:var(--paper); padding:9px 10px; font-family:'Source Serif 4', serif;
+    border-radius:4px; color:var(--paper); padding:9px 10px; font-family:'Source Serif 4', serif; transition: border-color 0.2s;
   }
+  .add-module-row input:focus{ outline:none; border-color: var(--gold); }
 
   .roadmap-intro{ font-size:13px; color:rgba(241,234,217,0.5); margin-bottom:18px; line-height:1.6; }
   .path-wrap{ margin-bottom:8px; }
-  .day-node{ display:flex; gap:14px; padding:14px 4px; border-bottom:1px solid var(--line); cursor:pointer; align-items:flex-start; position:relative; }
+  .day-node{
+    display:flex; gap:14px; padding:14px 4px; border-bottom:1px solid var(--line); cursor:pointer; align-items:flex-start; position:relative;
+    animation: fadeSlideUp 0.4s var(--ease) both; animation-delay: calc(var(--i, 0) * 35ms);
+    transition: background 0.2s;
+    border-radius:4px;
+  }
+  .day-node:hover{ background: rgba(241,234,217,0.02); }
   .day-node:last-child{ border-bottom:none; }
   .node-col{ display:flex; flex-direction:column; align-items:center; width:34px; flex-shrink:0; }
-  .node-circle{ width:34px; height:34px; border-radius:50%; border:2px solid rgba(241,234,217,0.3); display:flex; align-items:center; justify-content:center; position:relative; flex-shrink:0; font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:600; color:rgba(241,234,217,0.6); background: var(--ink); z-index:1; }
+  .node-circle{
+    width:34px; height:34px; border-radius:50%; border:2px solid rgba(241,234,217,0.3); display:flex; align-items:center;
+    justify-content:center; position:relative; flex-shrink:0; font-family:'IBM Plex Mono', monospace; font-size:12px;
+    font-weight:600; color:rgba(241,234,217,0.6); background: var(--ink); z-index:1; transition: all 0.3s var(--ease-spring);
+  }
   .node-circle svg{ position:absolute; inset:-2px; transform:rotate(-90deg); }
-  .node-circle.complete{ border-color: var(--gold); color: var(--gold); background: rgba(201,162,75,0.12); }
-  .node-edge{ width:2px; flex:1; background: var(--line-strong); margin-top:2px; min-height:14px; }
+  .node-circle.complete{ border-color: var(--gold); color: var(--gold); background: rgba(201,162,75,0.12); animation: scalePop 0.4s var(--ease-spring); }
+  .node-edge{ width:2px; flex:1; background: var(--line-strong); margin-top:2px; min-height:14px; transition: background 0.4s, opacity 0.4s; }
   .node-edge.complete{ background: var(--gold); opacity:0.5; }
   .day-info{ flex:1; padding-top:4px; }
   .day-title-row{ display:flex; align-items:baseline; justify-content:space-between; gap:8px; flex-wrap:wrap; }
   .day-title{ font-family:'Source Serif 4', serif; font-size:15.5px; font-weight:600; }
   .day-hrs{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:rgba(241,234,217,0.45); white-space:nowrap; }
   .day-topics{ font-size:12.5px; color:rgba(241,234,217,0.45); margin-top:3px; line-height:1.5; }
-  .day-tasks{ display:none; margin-top:10px; border-top:1px solid var(--line); padding-top:10px; }
-  .day-node.open .day-tasks{ display:block; }
+  .day-tasks-outer{ display:grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s var(--ease); }
+  .day-node.open .day-tasks-outer{ grid-template-rows: 1fr; }
+  .day-tasks{ overflow:hidden; min-height:0; margin-top:0; border-top:0 solid var(--line); }
+  .day-node.open .day-tasks{ margin-top:10px; border-top-width:1px; padding-top:10px; }
 
-  .empty-subject{ border:1px dashed var(--line-strong); border-radius:2px; padding:28px 18px; text-align:center; color:rgba(241,234,217,0.4); font-size:13px; line-height:1.6; }
-  .empty-modules{ border:1px dashed var(--line-strong); border-radius:2px; padding:24px 18px; text-align:center; color:rgba(241,234,217,0.4); font-size:13px; margin-bottom:12px; }
+  .empty-subject{ border:1px dashed var(--line-strong); border-radius:6px; padding:28px 18px; text-align:center; color:rgba(241,234,217,0.4); font-size:13px; line-height:1.6; animation: fadeIn 0.4s; }
+  .empty-modules{ border:1px dashed var(--line-strong); border-radius:6px; padding:24px 18px; text-align:center; color:rgba(241,234,217,0.4); font-size:13px; margin-bottom:12px; animation: fadeIn 0.4s; }
 
   .footer-note{ margin-top:26px; font-size:11.5px; color:rgba(241,234,217,0.35); text-align:center; font-family:'IBM Plex Mono', monospace; letter-spacing:0.03em; }
+
+  .confetti-layer{ position:fixed; inset:0; pointer-events:none; z-index:50; overflow:hidden; }
+  .confetti-piece{ position:absolute; top:-10px; border-radius:1px; animation: confettiFall 1.3s ease-in forwards; }
 
   @media (max-width: 420px){
     .instrument-pct{ font-size:32px; }
     .module-name{ font-size:16px; }
     .total-pct{ font-size:30px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+    body::before{ animation:none; }
   }
 </style>
 </head>
@@ -502,7 +584,7 @@ function RingMini({pct}){
   return (
     <svg width="26" height="26" viewBox="0 0 26 26">
       <circle cx="13" cy="13" r={r} stroke="rgba(241,234,217,0.15)" strokeWidth="2.5" fill="none"/>
-      <circle cx="13" cy="13" r={r} stroke="#c9a24b" strokeWidth="2.5" fill="none"
+      <circle className="ring-fill" cx="13" cy="13" r={r} stroke="#c9a24b" strokeWidth="2.5" fill="none"
         strokeDasharray={c} strokeDashoffset={c-(pct/100)*c} strokeLinecap="round" transform="rotate(-90 13 13)"/>
     </svg>
   );
@@ -513,22 +595,78 @@ function NodeRing({pct, complete}){
     <svg width="34" height="34" viewBox="0 0 34 34">
       <circle cx="17" cy="17" r={r} stroke={complete?"#c9a24b":"rgba(241,234,217,0.2)"} strokeWidth="2" fill="none"/>
       {!complete && pct>0 && (
-        <circle cx="17" cy="17" r={r} stroke="#5b7a9d" strokeWidth="2" fill="none"
+        <circle className="ring-fill" cx="17" cy="17" r={r} stroke="#5b7a9d" strokeWidth="2" fill="none"
           strokeDasharray={c} strokeDashoffset={c-(pct/100)*c} strokeLinecap="round"/>
       )}
     </svg>
   );
 }
 
+// ---------- ANIMATED NUMBER ----------
+function AnimatedNumber({value, decimals=1}){
+  const [display, setDisplay] = useState(value);
+  const prevRef = React.useRef(value);
+  const rafRef = React.useRef(null);
+
+  useEffect(()=>{
+    const from = prevRef.current;
+    const to = value;
+    if(from === to){ setDisplay(to); return; }
+    const start = performance.now();
+    const duration = 500;
+    cancelAnimationFrame(rafRef.current);
+    const tick = (now)=>{
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setDisplay(from + (to - from) * eased);
+      if(t < 1){ rafRef.current = requestAnimationFrame(tick); }
+      else{ prevRef.current = to; }
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return ()=> cancelAnimationFrame(rafRef.current);
+  }, [value]);
+
+  return <React.Fragment>{display.toFixed(decimals)}</React.Fragment>;
+}
+
+// ---------- CONFETTI ----------
+function Confetti({burstKey}){
+  const pieces = useMemo(()=>{
+    if(!burstKey) return [];
+    const colors = ['#c9a24b', '#5b7a9d', '#f4efe4', '#9c5b45'];
+    return Array.from({length: 26}).map((_,i)=>({
+      id: i,
+      left: Math.random()*100,
+      color: colors[i % colors.length],
+      size: 4 + Math.random()*5,
+      delay: Math.random()*0.3,
+      duration: 0.9 + Math.random()*0.6,
+      rotate: Math.random()*360,
+    }));
+  }, [burstKey]);
+  if(!pieces.length) return null;
+  return (
+    <div className="confetti-layer">
+      {pieces.map(p=>(
+        <div key={p.id} className="confetti-piece" style={{
+          left: p.left + '%', width: p.size, height: p.size*0.4, background: p.color,
+          animationDelay: p.delay + 's', animationDuration: p.duration + 's',
+          transform: `rotate(${p.rotate}deg)`,
+        }}/>
+      ))}
+    </div>
+  );
+}
+
 // ---------- MODULE ----------
-function Module({mod, done, editMode, openKey, setOpenKey, onToggleItem, onDeleteModule, onRenameModule, onAddItem, onDeleteItem, onRenameItem, onUpdateHrs}){
+function Module({mod, done, editMode, openKey, setOpenKey, onToggleItem, onDeleteModule, onRenameModule, onAddItem, onDeleteItem, onRenameItem, onUpdateHrs, index}){
   const isOpen = openKey === mod.key;
   const totalHrs = mod.items.reduce((s,i)=>s+i.hrs,0);
   const doneHrs = mod.items.reduce((s,i)=>s+(done[i.id]?i.hrs:0),0);
   const pct = totalHrs ? Math.round((doneHrs/totalHrs)*100) : 0;
 
   return (
-    <div className={"module" + (isOpen? " open":"")}>
+    <div className={"module" + (isOpen? " open":"")} style={{'--i': index}}>
       <div className="module-head" onClick={()=>setOpenKey(isOpen? null : mod.key)}>
         <div className="module-title">
           {editMode ? (
@@ -538,7 +676,7 @@ function Module({mod, done, editMode, openKey, setOpenKey, onToggleItem, onDelet
           )}
         </div>
         <div className="module-stat">
-          <span>{pct}%</span>
+          <span><AnimatedNumber value={pct} decimals={0}/>%</span>
           <div className="module-ring"><RingMini pct={pct}/></div>
           {editMode && (
             <button className="del-btn" title="Delete module" onClick={(e)=>{ e.stopPropagation(); onDeleteModule(mod.key); }}>✕</button>
@@ -546,6 +684,7 @@ function Module({mod, done, editMode, openKey, setOpenKey, onToggleItem, onDelet
           <span className="chev">▶</span>
         </div>
       </div>
+      <div className="module-body-outer">
       <div className="module-body">
         {mod.items.length === 0 && !editMode && (
           <div style={{padding:'14px 16px', fontSize:12.5, color:'rgba(241,234,217,0.4)'}}>No topics yet.</div>
@@ -570,12 +709,13 @@ function Module({mod, done, editMode, openKey, setOpenKey, onToggleItem, onDelet
         ))}
         {editMode && <AddItemRow onAdd={(name,hrs)=>onAddItem(mod.key, name, hrs)}/>}
       </div>
+      </div>
     </div>
   );
 }
 
 // ---------- DAY NODE (roadmap) ----------
-function DayNode({day, done, toggle, isLast, openDay, setOpenDay, editRoadmap, breakSet, onToggleBreak}){
+function DayNode({day, done, toggle, isLast, openDay, setOpenDay, editRoadmap, breakSet, onToggleBreak, index}){
   const total = day.hrs;
   const doneH = day.items.reduce((s,it)=>s+(done[it.id]?it.hrs:0),0);
   const pct = total ? (doneH/total)*100 : 0;
@@ -584,7 +724,7 @@ function DayNode({day, done, toggle, isLast, openDay, setOpenDay, editRoadmap, b
   const topicsLine = day.modulesCovered.join(', ');
 
   return (
-    <div className={"day-node" + (isOpen? " open":"")} onClick={()=>setOpenDay(isOpen? null: day.n)}>
+    <div className={"day-node" + (isOpen? " open":"")} style={{'--i': index}} onClick={()=>setOpenDay(isOpen? null: day.n)}>
       <div className="node-col">
         <div className={"node-circle" + (complete? " complete":"")}>
           <NodeRing pct={pct} complete={complete}/>
@@ -598,6 +738,7 @@ function DayNode({day, done, toggle, isLast, openDay, setOpenDay, editRoadmap, b
           <div className="day-hrs">{total.toFixed(1)}h / {MAX_HOURS_PER_DAY}h cap</div>
         </div>
         <div className="day-topics">{topicsLine}</div>
+        <div className="day-tasks-outer">
         <div className="day-tasks">
           {day.items.map(it=>(
             <div key={it.id} className={"item" + (done[it.id]? " done":"")} style={{padding:'8px 0'}}
@@ -614,6 +755,7 @@ function DayNode({day, done, toggle, isLast, openDay, setOpenDay, editRoadmap, b
             </div>
           ))}
         </div>
+        </div>
       </div>
     </div>
   );
@@ -626,7 +768,7 @@ function SyncBadge({status, errorMsg, onRetry}){
   return (
     <div className="sync-row">
       <div className={"sync-dot " + status}></div>
-      <span className={"sync-text" + (status==='error'? " error":"")}>{label}</span>
+      <span key={status} className={"sync-text" + (status==='error'? " error":"")} style={{animation:'flashText 0.3s var(--ease)'}}>{label}</span>
       {status==='error' && <button className="retry-btn" onClick={onRetry}>Retry</button>}
     </div>
   );
@@ -674,6 +816,16 @@ function App(){
     return { doneH, totH, pct: totH ? (doneH/totH)*100 : 0, perSubject };
   }, [subjects]);
 
+  const [confettiBurst, setConfettiBurst] = useState(0);
+  const prevTotalPctRef = React.useRef(null);
+  useEffect(()=>{
+    const p = totalTracker.pct;
+    if(prevTotalPctRef.current !== null && prevTotalPctRef.current < 100 && p >= 100 && totalTracker.totH > 0){
+      setConfettiBurst(k=>k+1);
+    }
+    prevTotalPctRef.current = p;
+  }, [totalTracker.pct, totalTracker.totH]);
+
   const onToggleItem = (id)=> mutate(subjectKey, cur=>({ ...cur, done: { ...cur.done, [id]: !cur.done[id] } }));
 
   const onToggleBreak = (itemId)=> mutate(subjectKey, cur=>{
@@ -720,10 +872,12 @@ function App(){
 
       <SyncBadge status={status} errorMsg={errorMsg} onRetry={reload}/>
 
-      <div className="total-tracker">
+      <Confetti burstKey={confettiBurst}/>
+
+      <div className={"total-tracker" + (totalTracker.pct >= 100 && totalTracker.totH > 0 ? " complete" : "")}>
         <p className="total-label">Total tracker — all subjects</p>
         <div className="instrument-row">
-          <div className="total-pct">{totalTracker.pct.toFixed(1)}<span>%</span></div>
+          <div className="total-pct"><AnimatedNumber value={totalTracker.pct}/><span>%</span></div>
           <div className="total-meta">{totalTracker.doneH.toFixed(1)}h / {totalTracker.totH.toFixed(1)}h<br/>{DEFAULT_SUBJECTS.length} subjects</div>
         </div>
         <div className="track"><div className="track-fill" style={{width: totalTracker.pct + '%'}}></div></div>
@@ -755,7 +909,7 @@ function App(){
       <React.Fragment>
       <div className="instrument">
         <div className="instrument-row">
-          <div className="instrument-pct">{pct.toFixed(1)}<span>%</span></div>
+          <div className="instrument-pct"><AnimatedNumber value={pct}/><span>%</span></div>
           <div className="instrument-meta">
             {doneHrs.toFixed(2)}h / {totalHrs.toFixed(2)}h<br/>
             {doneCount}/{allItems.length} topics{days.length ? ` · ${daysComplete}/${days.length} days` : ''}
@@ -779,8 +933,8 @@ function App(){
           {subjectData.modules.length === 0 && (
             <div className="empty-modules">No modules yet — turn on editing above to add your first one.</div>
           )}
-          {subjectData.modules.map(mod=>(
-            <Module key={mod.key} mod={mod} done={done} editMode={editMode} openKey={openKey} setOpenKey={setOpenKey}
+          {subjectData.modules.map((mod, idx)=>(
+            <Module key={mod.key} mod={mod} done={done} editMode={editMode} openKey={openKey} setOpenKey={setOpenKey} index={idx}
               onToggleItem={onToggleItem} onDeleteModule={onDeleteModule} onRenameModule={onRenameModule}
               onAddItem={onAddItem} onDeleteItem={onDeleteItem} onRenameItem={onRenameItem} onUpdateHrs={onUpdateHrs}/>
           ))}
@@ -799,7 +953,7 @@ function App(){
             </div>
             <div className="path-wrap">
               {days.map((d,idx)=>(
-                <DayNode key={d.n} day={d} done={done} toggle={onToggleItem} isLast={idx===days.length-1}
+                <DayNode key={d.n} day={d} done={done} toggle={onToggleItem} isLast={idx===days.length-1} index={idx}
                   openDay={openDay} setOpenDay={setOpenDay} editRoadmap={editRoadmap} breakSet={breakSet} onToggleBreak={onToggleBreak}/>
               ))}
             </div>
