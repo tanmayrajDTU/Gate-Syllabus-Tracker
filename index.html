@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GATE CSE Tracker</title>
+<meta name="description" content="Checklist and roadmap tracker for GATE CSE 2027 preparation.">
+<meta name="theme-color" content="#171d26">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23171d26'/%3E%3Ccircle cx='20' cy='20' r='7' fill='none' stroke='%23c9a24b' stroke-width='3'/%3E%3Ccircle cx='44' cy='20' r='7' fill='none' stroke='%235b7a9d' stroke-width='3'/%3E%3Ccircle cx='32' cy='46' r='7' fill='%23c9a24b'/%3E%3Cline x1='25' y1='25' x2='38' y2='41' stroke='%23c9a24b' stroke-width='3'/%3E%3Cline x1='39' y1='25' x2='36' y2='40' stroke='%235b7a9d' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23171d26'/%3E%3Ccircle cx='20' cy='20' r='7' fill='none' stroke='%23c9a24b' stroke-width='3'/%3E%3Ccircle cx='44' cy='20' r='7' fill='none' stroke='%235b7a9d' stroke-width='3'/%3E%3Ccircle cx='32' cy='46' r='7' fill='%23c9a24b'/%3E%3Cline x1='25' y1='25' x2='38' y2='41' stroke='%23c9a24b' stroke-width='3'/%3E%3Cline x1='39' y1='25' x2='36' y2='40' stroke='%235b7a9d' stroke-width='3'/%3E%3C/svg%3E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GATE Tracker">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#171d26;
+    --paper:#f4efe4;
+    --gold:#c9a24b;
+    --slate:#5b7a9d;
+    --rust:#9c5b45;
+    --green:#6a9c6a;
+    --line: rgba(241,234,217,0.14);
+    --line-strong: rgba(241,234,217,0.28);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: var(--ink);
+    color: var(--paper);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background: var(--gold); color:var(--ink); }
+  .app{max-width:780px; margin:0 auto; padding:28px 18px 80px;}
+
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.18em;
+    text-transform:uppercase; color: var(--gold); margin:0 0 6px;
+  }
+  h1{
+    font-family:'Source Serif 4', serif; font-weight:600; font-size:clamp(24px,6vw,32px);
+    margin:0 0 4px; letter-spacing:-0.01em;
+  }
+  .sub{ color: rgba(241,234,217,0.55); font-size:13.5px; margin:0 0 18px; line-height:1.5; }
+
+  .sync-row{ display:flex; align-items:center; gap:8px; margin-bottom:18px; }
+  .sync-dot{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .sync-dot.synced{ background: var(--green); }
+  .sync-dot.saving{ background: var(--gold); animation: pulse 1s infinite; }
+  .sync-dot.error{ background: var(--rust); }
+  .sync-dot.loading{ background: rgba(241,234,217,0.35); }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  .sync-text{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:rgba(241,234,217,0.45); }
+  .sync-text.error{ color: var(--rust); }
+  .retry-btn{
+    margin-left:auto; font-family:'IBM Plex Mono', monospace; font-size:11px; color: var(--gold);
+    background:none; border:1px solid var(--line-strong); border-radius:20px; padding:4px 10px; cursor:pointer;
+  }
+
+  /* Total tracker (all subjects) */
+  .total-tracker{
+    border:1px solid var(--gold); border-radius:2px; padding:18px; margin-bottom:20px; position:relative; overflow:hidden;
+    background: linear-gradient(180deg, rgba(201,162,75,0.08), transparent);
+  }
+  .total-tracker .instrument-row{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
+  .total-label{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin:0 0 10px; }
+  .total-pct{ font-family:'IBM Plex Mono', monospace; font-size:36px; font-weight:600; line-height:1; }
+  .total-pct span{ font-size:15px; color:rgba(241,234,217,0.5); font-weight:400; }
+  .total-meta{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:rgba(241,234,217,0.5); text-align:right; }
+  .mini-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap:6px; margin-top:14px; }
+  .mini-subject{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:rgba(241,234,217,0.55); border:1px solid var(--line); border-radius:2px; padding:6px 8px; cursor:pointer; }
+  .mini-subject:hover{ border-color: var(--line-strong); }
+  .mini-subject.current{ border-color: var(--gold); color: var(--gold); }
+  .mini-subject-name{ display:block; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .mini-track{ height:3px; background:rgba(241,234,217,0.12); border-radius:2px; overflow:hidden; }
+  .mini-fill{ height:100%; background: var(--gold); }
+
+  .subjects{ display:flex; gap:8px; margin-bottom:18px; overflow-x:auto; padding-bottom:2px; }
+  .subject-pill{
+    font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.03em; padding:8px 14px;
+    border:1px solid var(--line-strong); border-radius:20px; color:rgba(241,234,217,0.55); cursor:pointer;
+    white-space:nowrap; flex-shrink:0; background:transparent; transition: all 0.15s;
+  }
+  .subject-pill.active{ background:rgba(201,162,75,0.14); border-color:var(--gold); color:var(--gold); }
+  .subject-pill .p{ opacity:0.6; margin-left:6px; }
+
+  .instrument{ border:1px solid var(--line-strong); border-radius:2px; padding:18px 18px 16px; margin-bottom:18px; position:relative; overflow:hidden; }
+  .instrument::before{ content:""; position:absolute; inset:0; background: repeating-linear-gradient(90deg, var(--line) 0px, var(--line) 1px, transparent 1px, transparent 24px); opacity:0.5; pointer-events:none; }
+  .instrument-row{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; position:relative; }
+  .instrument-pct{ font-family:'IBM Plex Mono', monospace; font-size:38px; font-weight:600; color: var(--paper); line-height:1; }
+  .instrument-pct span{ font-size:16px; color:rgba(241,234,217,0.5); font-weight:400; }
+  .instrument-meta{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:rgba(241,234,217,0.55); text-align:right; }
+  .track{ height:6px; background:rgba(241,234,217,0.1); border-radius:3px; margin-top:14px; overflow:hidden; position:relative; }
+  .track-fill{ height:100%; background: linear-gradient(90deg, var(--slate), var(--gold)); border-radius:3px; transition: width 0.5s ease; }
+
+  .tabs{ display:flex; gap:2px; margin-bottom:16px; border:1px solid var(--line-strong); border-radius:2px; overflow:hidden; }
+  .tab{ flex:1; text-align:center; padding:11px 10px; cursor:pointer; font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:rgba(241,234,217,0.5); background:transparent; border:none; transition: color 0.2s, background 0.2s; }
+  .tab.active{ background:rgba(201,162,75,0.14); color:var(--gold); }
+  .tab:not(.active):hover{ color:var(--paper); }
+
+  .edit-toggle-row{ display:flex; justify-content:flex-end; margin-bottom:12px; }
+  .edit-toggle{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.05em; text-transform:uppercase;
+    color: rgba(241,234,217,0.5); background:none; border:1px solid var(--line-strong); border-radius:20px;
+    padding:6px 14px; cursor:pointer; display:flex; align-items:center; gap:6px;
+  }
+  .edit-toggle.on{ color: var(--gold); border-color: var(--gold); background: rgba(201,162,75,0.1); }
+
+  .module{ border:1px solid var(--line-strong); border-radius:2px; margin-bottom:12px; overflow:hidden; }
+  .module-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 16px; cursor:pointer; user-select:none; }
+  .module-head:hover{ background: rgba(241,234,217,0.03); }
+  .module-title{ display:flex; align-items:baseline; gap:10px; flex:1; min-width:0; }
+  .module-name{ font-family:'Source Serif 4', serif; font-size:17px; font-weight:600; }
+  .module-name-input{
+    font-family:'Source Serif 4', serif; font-size:16px; font-weight:600; background:rgba(241,234,217,0.06);
+    border:1px solid var(--line-strong); border-radius:2px; color:var(--paper); padding:5px 8px; width:100%; max-width:320px;
+  }
+  .module-stat{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:rgba(241,234,217,0.5); display:flex; align-items:center; gap:10px; flex-shrink:0; }
+  .module-ring{ width:26px; height:26px; flex-shrink:0; }
+  .chev{ transition: transform 0.2s; opacity:0.5; font-size:11px; }
+  .module.open .chev{ transform: rotate(90deg); }
+  .module-body{ display:none; border-top:1px solid var(--line); }
+  .module.open .module-body{ display:block; }
+  .del-btn{
+    font-family:'IBM Plex Mono', monospace; font-size:13px; color: var(--rust); background:none; border:none;
+    cursor:pointer; padding:2px 6px; opacity:0.7; flex-shrink:0;
+  }
+  .del-btn:hover{ opacity:1; }
+
+  .item{ display:flex; align-items:center; gap:12px; padding:11px 16px; border-bottom:1px solid var(--line); cursor:pointer; }
+  .item:last-child{ border-bottom:none; }
+  .item:hover{ background: rgba(241,234,217,0.03); }
+  .box{ width:18px; height:18px; border:1.5px solid rgba(241,234,217,0.35); border-radius:3px; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition: all 0.15s; }
+  .box.checked{ background:var(--gold); border-color:var(--gold); }
+  .box.checked::after{ content:"✓"; color:var(--ink); font-size:12px; font-weight:700; }
+  .item-name{ flex:1; font-size:14px; line-height:1.4; }
+  .item.done .item-name{ color:rgba(241,234,217,0.4); text-decoration:line-through; }
+  .item-hrs{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:rgba(241,234,217,0.45); flex-shrink:0; }
+  .item-name-input{
+    flex:1; font-size:13.5px; background:rgba(241,234,217,0.06); border:1px solid var(--line-strong);
+    border-radius:2px; color:var(--paper); padding:6px 8px; font-family:'Inter',sans-serif;
+  }
+  .item-hrs-input{
+    width:56px; font-family:'IBM Plex Mono', monospace; font-size:12px; background:rgba(241,234,217,0.06);
+    border:1px solid var(--line-strong); border-radius:2px; color:var(--paper); padding:6px 6px; text-align:right;
+  }
+
+  .add-row{ display:flex; align-items:center; gap:8px; padding:11px 16px; border-top:1px dashed var(--line-strong); }
+  .add-row input[type=text]{
+    flex:1; font-size:13.5px; background:rgba(241,234,217,0.04); border:1px solid var(--line-strong);
+    border-radius:2px; color:var(--paper); padding:7px 9px; font-family:'Inter',sans-serif;
+  }
+  .add-row input[type=number]{
+    width:64px; font-family:'IBM Plex Mono', monospace; font-size:12px; background:rgba(241,234,217,0.04);
+    border:1px solid var(--line-strong); border-radius:2px; color:var(--paper); padding:7px 6px; text-align:right;
+  }
+  .add-btn{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.05em; text-transform:uppercase;
+    color:var(--ink); background:var(--gold); border:none; border-radius:2px; padding:7px 12px; cursor:pointer; flex-shrink:0;
+  }
+  .add-btn:hover{ opacity:0.9; }
+  .add-module-row{ padding:14px 16px; border:1px dashed var(--line-strong); border-radius:2px; display:flex; gap:8px; align-items:center; }
+  .add-module-row input{
+    flex:1; font-size:14px; background:rgba(241,234,217,0.04); border:1px solid var(--line-strong);
+    border-radius:2px; color:var(--paper); padding:9px 10px; font-family:'Source Serif 4', serif;
+  }
+
+  .roadmap-intro{ font-size:13px; color:rgba(241,234,217,0.5); margin-bottom:18px; line-height:1.6; }
+  .path-wrap{ margin-bottom:8px; }
+  .day-node{ display:flex; gap:14px; padding:14px 4px; border-bottom:1px solid var(--line); cursor:pointer; align-items:flex-start; position:relative; }
+  .day-node:last-child{ border-bottom:none; }
+  .node-col{ display:flex; flex-direction:column; align-items:center; width:34px; flex-shrink:0; }
+  .node-circle{ width:34px; height:34px; border-radius:50%; border:2px solid rgba(241,234,217,0.3); display:flex; align-items:center; justify-content:center; position:relative; flex-shrink:0; font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:600; color:rgba(241,234,217,0.6); background: var(--ink); z-index:1; }
+  .node-circle svg{ position:absolute; inset:-2px; transform:rotate(-90deg); }
+  .node-circle.complete{ border-color: var(--gold); color: var(--gold); background: rgba(201,162,75,0.12); }
+  .node-edge{ width:2px; flex:1; background: var(--line-strong); margin-top:2px; min-height:14px; }
+  .node-edge.complete{ background: var(--gold); opacity:0.5; }
+  .day-info{ flex:1; padding-top:4px; }
+  .day-title-row{ display:flex; align-items:baseline; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .day-title{ font-family:'Source Serif 4', serif; font-size:15.5px; font-weight:600; }
+  .day-hrs{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:rgba(241,234,217,0.45); white-space:nowrap; }
+  .day-topics{ font-size:12.5px; color:rgba(241,234,217,0.45); margin-top:3px; line-height:1.5; }
+  .day-tasks{ display:none; margin-top:10px; border-top:1px solid var(--line); padding-top:10px; }
+  .day-node.open .day-tasks{ display:block; }
+
+  .empty-subject{ border:1px dashed var(--line-strong); border-radius:2px; padding:28px 18px; text-align:center; color:rgba(241,234,217,0.4); font-size:13px; line-height:1.6; }
+  .empty-modules{ border:1px dashed var(--line-strong); border-radius:2px; padding:24px 18px; text-align:center; color:rgba(241,234,217,0.4); font-size:13px; margin-bottom:12px; }
+
+  .footer-note{ margin-top:26px; font-size:11.5px; color:rgba(241,234,217,0.35); text-align:center; font-family:'IBM Plex Mono', monospace; letter-spacing:0.03em; }
+
+  @media (max-width: 420px){
+    .instrument-pct{ font-size:32px; }
+    .module-name{ font-size:16px; }
+    .total-pct{ font-size:30px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const {useState, useEffect, useMemo, useCallback} = React;
+
+// =====================================================================
+// SUPABASE — single source of truth. Table: gate_progress(
+//   subject_key text primary key, name text, modules jsonb,
+//   data jsonb /* completion map */, updated_at timestamptz )
+// =====================================================================
+const SUPABASE_URL = 'https://yrlsjipphkrpfotfubrs.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlybHNqaXBwaGtycGZvdGZ1YnJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0NTE3NTEsImV4cCI6MjA5OTAyNzc1MX0.bNYFaVCKkxob5RE5FYfrw3o1Tdpnx0KJtdU_paYAyfs';
+const sbHeaders = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
+
+async function fetchAllRows(){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/gate_progress?select=subject_key,name,modules,data,breaks`, { headers: sbHeaders });
+  if(!res.ok) throw new Error(`load failed (${res.status})`);
+  const rows = await res.json();
+  return Object.fromEntries(rows.map(r => [r.subject_key, r]));
+}
+
+async function saveSubjectRow(subjectKey, {name, modules, done, breaks}){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/gate_progress?on_conflict=subject_key`, {
+    method: 'POST',
+    headers: { ...sbHeaders, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' },
+    body: JSON.stringify([{ subject_key: subjectKey, name, modules, data: done, breaks: breaks || [], updated_at: new Date().toISOString() }]),
+  });
+  if(!res.ok) throw new Error(`save failed (${res.status})`);
+}
+
+function uid(prefix){ return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`; }
+
+// =====================================================================
+// SEED DATA — used only the first time a subject has no row in the
+// database yet. After that, the database (modules + done) is the only
+// source of truth, and everything is editable from the Checklist tab.
+// =====================================================================
+const DEFAULT_SUBJECTS = [
+  {
+    key: 'discrete-math',
+    name: 'Discrete Mathematics',
+    modules: [
+      { key:"prop", name:"Propositional Logic", items:[
+        {id:1, name:"Summary — part 1", hrs:2.5}, {id:2, name:"Summary — part 2", hrs:3},
+        {id:3, name:"Summary — part 3", hrs:2}, {id:4, name:"PYQs", hrs:5.5},
+      ]},
+      { key:"fol", name:"First Order Logic", items:[
+        {id:5, name:"Complete summary — part 1", hrs:2.5}, {id:6, name:"Complete summary — part 2", hrs:3.5},
+        {id:7, name:"Practice questions", hrs:2}, {id:8, name:"GATE PYQs", hrs:7},
+      ]},
+      { key:"set", name:"Set Theory, Relations, Posets & Lattices", items:[
+        {id:9, name:"Set theory summary", hrs:1.6}, {id:10, name:"Set theory — GATE PYQs", hrs:2.75},
+        {id:11, name:"Relations summary", hrs:1.5}, {id:12, name:"Relations — PYQs", hrs:4},
+        {id:13, name:"Poset summary", hrs:3.5}, {id:14, name:"Poset — PYQs", hrs:0.5},
+        {id:15, name:"Lattices", hrs:5}, {id:16, name:"Lattices — PYQs", hrs:2},
+      ]},
+      { key:"fn", name:"Functions", items:[ {id:17, name:"Summary + PYQs", hrs:4.5} ]},
+      { key:"grp", name:"Group Theory", items:[
+        {id:18, name:"Part 1 — summary", hrs:4.5}, {id:19, name:"Part 2 — complete summary", hrs:3},
+        {id:20, name:"Part 3", hrs:3.5}, {id:21, name:"PYQs", hrs:2},
+      ]},
+      { key:"comb", name:"Combinatorics", items:[
+        {id:22, name:"Lecture 1", hrs:3}, {id:23, name:"Lecture 2", hrs:3}, {id:24, name:"Practice questions", hrs:0.5},
+        {id:25, name:"Lecture 3", hrs:2}, {id:26, name:"Lecture 4", hrs:1.2}, {id:27, name:"Lecture 4B", hrs:3},
+        {id:28, name:"Lecture 4C", hrs:2}, {id:29, name:"Lecture 4D", hrs:1.5}, {id:30, name:"Lecture 5A", hrs:1.2},
+        {id:31, name:"PYQs — part 1", hrs:2}, {id:32, name:"PYQs — part 2", hrs:1.8}, {id:33, name:"Lecture 5B", hrs:2},
+        {id:34, name:"Lecture 6", hrs:3}, {id:35, name:"Lecture 7 — recurrence relations", hrs:3},
+        {id:36, name:"Lecture 8 — generating functions", hrs:4},
+      ]},
+      { key:"graph", name:"Graph Theory", items:[
+        {id:37, name:"Part 1", hrs:1.5}, {id:38, name:"Part 2", hrs:0.5}, {id:39, name:"Part 3", hrs:3},
+        {id:40, name:"PYQs — part 1", hrs:1}, {id:41, name:"Part 4", hrs:4}, {id:42, name:"Part 5", hrs:4},
+        {id:43, name:"Practice questions", hrs:0.5}, {id:44, name:"Part 6", hrs:3}, {id:45, name:"Part 6B", hrs:3},
+        {id:46, name:"GATE PYQs — part 1", hrs:2}, {id:47, name:"GATE PYQs — part 2", hrs:1.5},
+        {id:48, name:"GATE PYQs — part 3", hrs:3},
+      ]},
+    ],
+  },
+  { key:'eng-math', name:'Engineering Mathematics', modules:[
+    { key:'m1', name:'Linear Algebra', items:[
+      {id:uid('em'), name:'Matrices, determinants & rank', hrs:3},
+      {id:uid('em'), name:'Eigenvalues & eigenvectors', hrs:2.5},
+    ]},
+  ]},
+  { key:'digital-logic', name:'Digital Logic', modules:[
+    { key:'m1', name:'Boolean Algebra & Minimization', items:[
+      {id:uid('dl'), name:'K-maps & minimization', hrs:2},
+      {id:uid('dl'), name:'Number systems & codes', hrs:1.5},
+    ]},
+  ]},
+  { key:'coa', name:'Computer Organization & Architecture', modules:[
+    { key:'m1', name:'Pipelining', items:[
+      {id:uid('coa'), name:'Pipeline hazards & forwarding', hrs:2.5},
+    ]},
+  ]},
+  { key:'dsa', name:'Programming & Data Structures', modules:[
+    { key:'m1', name:'Trees', items:[
+      {id:uid('dsa'), name:'BSTs & balancing (AVL)', hrs:3},
+      {id:uid('dsa'), name:'Heaps & priority queues', hrs:2},
+    ]},
+  ]},
+  { key:'algo', name:'Algorithms', modules:[
+    { key:'m1', name:'Sorting & Searching', items:[
+      {id:uid('al'), name:'Divide and conquer recurrences', hrs:2.5},
+    ]},
+  ]},
+  { key:'toc', name:'Theory of Computation', modules:[
+    { key:'m1', name:'Finite Automata', items:[
+      {id:uid('toc'), name:'DFA / NFA construction', hrs:2},
+      {id:uid('toc'), name:'Regular expressions', hrs:1.5},
+    ]},
+  ]},
+  { key:'compiler', name:'Compiler Design', modules:[
+    { key:'m1', name:'Parsing', items:[
+      {id:uid('cd'), name:'LL(1) and LR parsers', hrs:3},
+    ]},
+  ]},
+  { key:'os', name:'Operating Systems', modules:[
+    { key:'m1', name:'Process Scheduling', items:[
+      {id:uid('os'), name:'CPU scheduling algorithms', hrs:2.5},
+      {id:uid('os'), name:'Deadlocks — detection & avoidance', hrs:2},
+    ]},
+  ]},
+  { key:'dbms', name:'Databases', modules:[
+    { key:'m1', name:'Normalization', items:[
+      {id:uid('db'), name:'Normal forms (1NF–BCNF)', hrs:2.5},
+    ]},
+  ]},
+  { key:'cn', name:'Computer Networks', modules:[
+    { key:'m1', name:'Network Layer', items:[
+      {id:uid('cn'), name:'IP addressing & subnetting', hrs:2.5},
+      {id:uid('cn'), name:'Routing algorithms', hrs:2},
+    ]},
+  ]},
+  { key:'aptitude', name:'General Aptitude', modules:[
+    { key:'m1', name:'Quantitative Aptitude', items:[
+      {id:uid('ga'), name:'Numerical ability practice', hrs:2},
+    ]},
+  ]},
+];
+
+// Roadmap is now built dynamically for every subject from its current
+// module/topic order — always in sync with the checklist, and capped so
+// no day exceeds MAX_HOURS_PER_DAY. `breaks` is a set of topic ids after
+// which the person has manually forced an early day-split (editable from
+// the Roadmap tab); the hour cap is enforced regardless of breaks.
+const MAX_HOURS_PER_DAY = 8;
+
+function buildRoadmap(allItems, breaksArr, cap){
+  const breakSet = new Set(breaksArr || []);
+  const days = [];
+  let current = { items: [], hrs: 0 };
+  const flush = ()=>{ if(current.items.length){ days.push(current); current = { items: [], hrs: 0 }; } };
+
+  allItems.forEach(item=>{
+    if(item.hrs > cap){
+      flush();
+      days.push({ items: [item], hrs: item.hrs });
+      return;
+    }
+    if(current.items.length && current.hrs + item.hrs > cap){
+      flush();
+    }
+    current.items.push(item);
+    current.hrs += item.hrs;
+    if(breakSet.has(item.id)){ flush(); }
+  });
+  flush();
+
+  return days.map((d, idx)=>({
+    n: idx + 1,
+    hrs: d.hrs,
+    items: d.items,
+    modulesCovered: [...new Set(d.items.map(i=>i.module))],
+  }));
+}
+
+function deriveData(modules){
+  const allItems = (modules||[]).flatMap(m => m.items.map(it => ({...it, module:m.name, moduleKey:m.key})));
+  const itemsById = Object.fromEntries(allItems.map(i=>[i.id,i]));
+  const totalHrs = allItems.reduce((s,i)=>s+i.hrs,0);
+  return { allItems, itemsById, totalHrs };
+}
+
+// ---------- APP-WIDE DATA STORE ----------
+function useAppData(){
+  const [subjects, setSubjects] = useState({}); // { key: {name, modules, done} }
+  const [status, setStatus] = useState('loading');
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const load = useCallback(async ()=>{
+    setStatus('loading');
+    try{
+      const rows = await fetchAllRows();
+      const merged = {};
+      const toSeed = [];
+      DEFAULT_SUBJECTS.forEach(def=>{
+        const row = rows[def.key];
+        if(row){
+          merged[def.key] = { name: row.name || def.name, modules: row.modules || def.modules, done: row.data || {}, breaks: row.breaks || [] };
+        }else{
+          merged[def.key] = { name: def.name, modules: def.modules, done: {}, breaks: [] };
+          toSeed.push(def.key);
+        }
+      });
+      setSubjects(merged);
+      setStatus('synced');
+      setErrorMsg('');
+      toSeed.forEach(k => { saveSubjectRow(k, merged[k]).catch(()=>{}); });
+    }catch(e){
+      const merged = {};
+      DEFAULT_SUBJECTS.forEach(def=>{ merged[def.key] = { name: def.name, modules: def.modules, done: {}, breaks: [] }; });
+      setSubjects(merged);
+      setStatus('error');
+      setErrorMsg('Could not reach the database — showing local defaults only, changes will not sync yet.');
+    }
+  },[]);
+
+  useEffect(()=>{ load(); },[load]);
+
+  const mutate = useCallback((subjectKey, updater)=>{
+    setSubjects(prev=>{
+      const cur = prev[subjectKey] || { name:'', modules:[], done:{}, breaks:[] };
+      const nextSubject = updater(cur);
+      const next = { ...prev, [subjectKey]: nextSubject };
+      setStatus('saving');
+      saveSubjectRow(subjectKey, nextSubject)
+        .then(()=>{ setStatus('synced'); setErrorMsg(''); })
+        .catch(()=>{ setStatus('error'); setErrorMsg('Last change may not have saved — check your connection.'); });
+      return next;
+    });
+  },[]);
+
+  return { subjects, status, errorMsg, mutate, reload: load };
+}
+
+// ---------- SMALL EDITABLE INPUTS ----------
+function EditableText({value, onCommit, placeholder, className}){
+  const [val, setVal] = useState(value);
+  useEffect(()=>{ setVal(value); }, [value]);
+  return (
+    <input className={className} value={val} placeholder={placeholder}
+      onChange={e=>setVal(e.target.value)}
+      onClick={e=>e.stopPropagation()}
+      onBlur={()=>{ const v=val.trim(); if(v && v!==value) onCommit(v); else setVal(value); }}
+      onKeyDown={e=>{ if(e.key==='Enter'){ e.currentTarget.blur(); } }} />
+  );
+}
+
+function EditableHrs({value, onCommit, className}){
+  const [val, setVal] = useState(String(value));
+  useEffect(()=>{ setVal(String(value)); }, [value]);
+  return (
+    <input type="number" step="0.1" min="0" className={className} value={val}
+      onChange={e=>setVal(e.target.value)}
+      onClick={e=>e.stopPropagation()}
+      onBlur={()=>{ const n=parseFloat(val); if(!isNaN(n) && n>=0 && n!==value) onCommit(n); else setVal(String(value)); }}
+      onKeyDown={e=>{ if(e.key==='Enter'){ e.currentTarget.blur(); } }} />
+  );
+}
+
+function AddItemRow({onAdd}){
+  const [name, setName] = useState('');
+  const [hrs, setHrs] = useState('1');
+  const submit = ()=>{
+    const n = name.trim(); const h = parseFloat(hrs);
+    if(!n) return;
+    onAdd(n, isNaN(h)||h<0 ? 1 : h);
+    setName(''); setHrs('1');
+  };
+  return (
+    <div className="add-row" onClick={e=>e.stopPropagation()}>
+      <input type="text" placeholder="New topic name" value={name} onChange={e=>setName(e.target.value)}
+        onKeyDown={e=>{ if(e.key==='Enter') submit(); }} />
+      <input type="number" step="0.1" min="0" value={hrs} onChange={e=>setHrs(e.target.value)}
+        onKeyDown={e=>{ if(e.key==='Enter') submit(); }} />
+      <button className="add-btn" onClick={submit}>+ Add</button>
+    </div>
+  );
+}
+
+function AddModuleRow({onAdd}){
+  const [name, setName] = useState('');
+  const submit = ()=>{ const n=name.trim(); if(!n) return; onAdd(n); setName(''); };
+  return (
+    <div className="add-module-row">
+      <input type="text" placeholder="New module name" value={name} onChange={e=>setName(e.target.value)}
+        onKeyDown={e=>{ if(e.key==='Enter') submit(); }} />
+      <button className="add-btn" onClick={submit}>+ Add module</button>
+    </div>
+  );
+}
+
+// ---------- RINGS ----------
+function RingMini({pct}){
+  const r=10, c=2*Math.PI*r;
+  return (
+    <svg width="26" height="26" viewBox="0 0 26 26">
+      <circle cx="13" cy="13" r={r} stroke="rgba(241,234,217,0.15)" strokeWidth="2.5" fill="none"/>
+      <circle cx="13" cy="13" r={r} stroke="#c9a24b" strokeWidth="2.5" fill="none"
+        strokeDasharray={c} strokeDashoffset={c-(pct/100)*c} strokeLinecap="round" transform="rotate(-90 13 13)"/>
+    </svg>
+  );
+}
+function NodeRing({pct, complete}){
+  const r=15, c=2*Math.PI*r;
+  return (
+    <svg width="34" height="34" viewBox="0 0 34 34">
+      <circle cx="17" cy="17" r={r} stroke={complete?"#c9a24b":"rgba(241,234,217,0.2)"} strokeWidth="2" fill="none"/>
+      {!complete && pct>0 && (
+        <circle cx="17" cy="17" r={r} stroke="#5b7a9d" strokeWidth="2" fill="none"
+          strokeDasharray={c} strokeDashoffset={c-(pct/100)*c} strokeLinecap="round"/>
+      )}
+    </svg>
+  );
+}
+
+// ---------- MODULE ----------
+function Module({mod, done, editMode, openKey, setOpenKey, onToggleItem, onDeleteModule, onRenameModule, onAddItem, onDeleteItem, onRenameItem, onUpdateHrs}){
+  const isOpen = openKey === mod.key;
+  const totalHrs = mod.items.reduce((s,i)=>s+i.hrs,0);
+  const doneHrs = mod.items.reduce((s,i)=>s+(done[i.id]?i.hrs:0),0);
+  const pct = totalHrs ? Math.round((doneHrs/totalHrs)*100) : 0;
+
+  return (
+    <div className={"module" + (isOpen? " open":"")}>
+      <div className="module-head" onClick={()=>setOpenKey(isOpen? null : mod.key)}>
+        <div className="module-title">
+          {editMode ? (
+            <EditableText value={mod.name} className="module-name-input" onCommit={(v)=>onRenameModule(mod.key, v)}/>
+          ) : (
+            <span className="module-name">{mod.name}</span>
+          )}
+        </div>
+        <div className="module-stat">
+          <span>{pct}%</span>
+          <div className="module-ring"><RingMini pct={pct}/></div>
+          {editMode && (
+            <button className="del-btn" title="Delete module" onClick={(e)=>{ e.stopPropagation(); onDeleteModule(mod.key); }}>✕</button>
+          )}
+          <span className="chev">▶</span>
+        </div>
+      </div>
+      <div className="module-body">
+        {mod.items.length === 0 && !editMode && (
+          <div style={{padding:'14px 16px', fontSize:12.5, color:'rgba(241,234,217,0.4)'}}>No topics yet.</div>
+        )}
+        {mod.items.map(it=>(
+          <div key={it.id} className={"item" + (done[it.id]? " done":"")} onClick={()=> !editMode && onToggleItem(it.id)}>
+            {!editMode && <div className={"box" + (done[it.id]? " checked":"")}></div>}
+            {editMode ? (
+              <React.Fragment>
+                <EditableText value={it.name} className="item-name-input" onCommit={(v)=>onRenameItem(mod.key, it.id, v)}/>
+                <EditableHrs value={it.hrs} className="item-hrs-input" onCommit={(v)=>onUpdateHrs(mod.key, it.id, v)}/>
+                <span className="item-hrs">h</span>
+                <button className="del-btn" title="Delete topic" onClick={(e)=>{ e.stopPropagation(); onDeleteItem(mod.key, it.id); }}>✕</button>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <div className="item-name">{it.name}</div>
+                <div className="item-hrs">{it.hrs}h</div>
+              </React.Fragment>
+            )}
+          </div>
+        ))}
+        {editMode && <AddItemRow onAdd={(name,hrs)=>onAddItem(mod.key, name, hrs)}/>}
+      </div>
+    </div>
+  );
+}
+
+// ---------- DAY NODE (roadmap) ----------
+function DayNode({day, done, toggle, isLast, openDay, setOpenDay, editRoadmap, breakSet, onToggleBreak}){
+  const total = day.hrs;
+  const doneH = day.items.reduce((s,it)=>s+(done[it.id]?it.hrs:0),0);
+  const pct = total ? (doneH/total)*100 : 0;
+  const complete = total>0 && pct === 100;
+  const isOpen = openDay === day.n;
+  const topicsLine = day.modulesCovered.join(', ');
+
+  return (
+    <div className={"day-node" + (isOpen? " open":"")} onClick={()=>setOpenDay(isOpen? null: day.n)}>
+      <div className="node-col">
+        <div className={"node-circle" + (complete? " complete":"")}>
+          <NodeRing pct={pct} complete={complete}/>
+          <span style={{position:'relative', zIndex:2}}>{complete? "✓" : day.n}</span>
+        </div>
+        {!isLast && <div className={"node-edge" + (complete? " complete":"")}></div>}
+      </div>
+      <div className="day-info">
+        <div className="day-title-row">
+          <div className="day-title">Day {day.n}</div>
+          <div className="day-hrs">{total.toFixed(1)}h / {MAX_HOURS_PER_DAY}h cap</div>
+        </div>
+        <div className="day-topics">{topicsLine}</div>
+        <div className="day-tasks">
+          {day.items.map(it=>(
+            <div key={it.id} className={"item" + (done[it.id]? " done":"")} style={{padding:'8px 0'}}
+                 onClick={(e)=>{ e.stopPropagation(); toggle(it.id); }}>
+              <div className={"box" + (done[it.id]? " checked":"")}></div>
+              <div className="item-name">{it.module} — {it.name}</div>
+              <div className="item-hrs">{it.hrs}h</div>
+              {editRoadmap && (
+                <button className="del-btn" title={breakSet.has(it.id) ? "Undo split — merge with next day" : "Split day after this topic"}
+                  onClick={(e)=>{ e.stopPropagation(); onToggleBreak(it.id); }}>
+                  {breakSet.has(it.id) ? "⌃" : "⌄"}
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SyncBadge({status, errorMsg, onRetry}){
+  const label = {
+    loading: 'Loading from database…', synced: 'Synced with database', saving: 'Saving…', error: errorMsg || 'Sync error',
+  }[status];
+  return (
+    <div className="sync-row">
+      <div className={"sync-dot " + status}></div>
+      <span className={"sync-text" + (status==='error'? " error":"")}>{label}</span>
+      {status==='error' && <button className="retry-btn" onClick={onRetry}>Retry</button>}
+    </div>
+  );
+}
+
+// ---------- APP ----------
+function App(){
+  const { subjects, status, errorMsg, mutate, reload } = useAppData();
+  const [subjectKey, setSubjectKey] = useState(DEFAULT_SUBJECTS[0].key);
+  const [tab, setTab] = useState('checklist');
+  const [editMode, setEditMode] = useState(false);
+  const [editRoadmap, setEditRoadmap] = useState(false);
+  const [openKey, setOpenKey] = useState(null);
+  const [openDay, setOpenDay] = useState(null);
+
+  const subjectData = subjects[subjectKey] || { name:'', modules:[], done:{}, breaks:[] };
+  const { allItems, itemsById, totalHrs } = useMemo(()=>deriveData(subjectData.modules), [subjectData.modules]);
+  const done = subjectData.done || {};
+  const breaks = subjectData.breaks || [];
+  const breakSet = useMemo(()=> new Set(breaks), [breaks]);
+  const days = useMemo(()=> buildRoadmap(allItems, breaks, MAX_HOURS_PER_DAY), [allItems, breaks]);
+
+  useEffect(()=>{
+    setOpenKey(subjectData.modules[0] ? subjectData.modules[0].key : null);
+    setOpenDay(null);
+    setTab('checklist');
+    setEditMode(false);
+    setEditRoadmap(false);
+  }, [subjectKey]);
+
+  const doneHrs = useMemo(()=> allItems.reduce((s,i)=>s+(done[i.id]?i.hrs:0),0), [done, allItems]);
+  const pct = totalHrs ? (doneHrs/totalHrs)*100 : 0;
+  const doneCount = allItems.filter(i=>done[i.id]).length;
+  const daysComplete = days.filter(d=> d.items.every(it=>done[it.id])).length;
+
+  const totalTracker = useMemo(()=>{
+    let doneH=0, totH=0;
+    const perSubject = DEFAULT_SUBJECTS.map(def=>{
+      const sd = subjects[def.key] || { modules: def.modules, done: {} };
+      const { allItems: items, totalHrs: tot } = deriveData(sd.modules);
+      const dh = items.reduce((s,i)=> s + (sd.done && sd.done[i.id] ? i.hrs : 0), 0);
+      doneH += dh; totH += tot;
+      return { key: def.key, name: sd.name || def.name, pct: tot ? (dh/tot)*100 : 0 };
+    });
+    return { doneH, totH, pct: totH ? (doneH/totH)*100 : 0, perSubject };
+  }, [subjects]);
+
+  const onToggleItem = (id)=> mutate(subjectKey, cur=>({ ...cur, done: { ...cur.done, [id]: !cur.done[id] } }));
+
+  const onToggleBreak = (itemId)=> mutate(subjectKey, cur=>{
+    const set = new Set(cur.breaks || []);
+    if(set.has(itemId)) set.delete(itemId); else set.add(itemId);
+    return { ...cur, breaks: Array.from(set) };
+  });
+
+  const onAddModule = (name)=> mutate(subjectKey, cur=>({ ...cur, modules: [...cur.modules, { key: uid('mod'), name, items: [] }] }));
+
+  const onDeleteModule = (moduleKey)=> mutate(subjectKey, cur=>{
+    const mod = cur.modules.find(m=>m.key===moduleKey);
+    const newDone = { ...cur.done };
+    (mod ? mod.items : []).forEach(i=>{ delete newDone[i.id]; });
+    return { ...cur, modules: cur.modules.filter(m=>m.key!==moduleKey), done: newDone };
+  });
+
+  const onRenameModule = (moduleKey, name)=> mutate(subjectKey, cur=>({
+    ...cur, modules: cur.modules.map(m=> m.key===moduleKey ? { ...m, name } : m),
+  }));
+
+  const onAddItem = (moduleKey, name, hrs)=> mutate(subjectKey, cur=>({
+    ...cur, modules: cur.modules.map(m=> m.key===moduleKey ? { ...m, items: [...m.items, { id: uid('item'), name, hrs }] } : m),
+  }));
+
+  const onDeleteItem = (moduleKey, itemId)=> mutate(subjectKey, cur=>{
+    const newDone = { ...cur.done }; delete newDone[itemId];
+    return { ...cur, modules: cur.modules.map(m=> m.key===moduleKey ? { ...m, items: m.items.filter(i=>i.id!==itemId) } : m), done: newDone };
+  });
+
+  const onRenameItem = (moduleKey, itemId, name)=> mutate(subjectKey, cur=>({
+    ...cur, modules: cur.modules.map(m=> m.key===moduleKey ? { ...m, items: m.items.map(i=> i.id===itemId ? { ...i, name } : i) } : m),
+  }));
+
+  const onUpdateHrs = (moduleKey, itemId, hrs)=> mutate(subjectKey, cur=>({
+    ...cur, modules: cur.modules.map(m=> m.key===moduleKey ? { ...m, items: m.items.map(i=> i.id===itemId ? { ...i, hrs } : i) } : m),
+  }));
+
+  return (
+    <div className="app">
+      <p className="eyebrow">GATE CSE 2027</p>
+      <h1>Traversal</h1>
+      <p className="sub">A checklist and route through your GATE CSE subjects. Backed by a shared database, so progress and structure are the same on every device.</p>
+
+      <SyncBadge status={status} errorMsg={errorMsg} onRetry={reload}/>
+
+      <div className="total-tracker">
+        <p className="total-label">Total tracker — all subjects</p>
+        <div className="instrument-row">
+          <div className="total-pct">{totalTracker.pct.toFixed(1)}<span>%</span></div>
+          <div className="total-meta">{totalTracker.doneH.toFixed(1)}h / {totalTracker.totH.toFixed(1)}h<br/>{DEFAULT_SUBJECTS.length} subjects</div>
+        </div>
+        <div className="track"><div className="track-fill" style={{width: totalTracker.pct + '%'}}></div></div>
+        <div className="mini-grid">
+          {totalTracker.perSubject.map(s=>(
+            <div key={s.key} className={"mini-subject" + (s.key===subjectKey? " current":"")} onClick={()=>setSubjectKey(s.key)}>
+              <span className="mini-subject-name">{s.name}</span>
+              <div className="mini-track"><div className="mini-fill" style={{width: s.pct + '%'}}></div></div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="subjects">
+        {DEFAULT_SUBJECTS.map(def=>{
+          const sd = subjects[def.key];
+          const p = totalTracker.perSubject.find(s=>s.key===def.key);
+          return (
+            <div key={def.key} className={"subject-pill" + (def.key===subjectKey? " active":"")} onClick={()=>setSubjectKey(def.key)}>
+              {(sd && sd.name) || def.name}<span className="p">{p ? Math.round(p.pct) : 0}%</span>
+            </div>
+          );
+        })}
+      </div>
+
+      {status==='loading' ? (
+        <p style={{color:'rgba(241,234,217,0.5)', fontFamily:'IBM Plex Mono, monospace', fontSize:13}}>Loading progress…</p>
+      ) : (
+      <React.Fragment>
+      <div className="instrument">
+        <div className="instrument-row">
+          <div className="instrument-pct">{pct.toFixed(1)}<span>%</span></div>
+          <div className="instrument-meta">
+            {doneHrs.toFixed(2)}h / {totalHrs.toFixed(2)}h<br/>
+            {doneCount}/{allItems.length} topics{days.length ? ` · ${daysComplete}/${days.length} days` : ''}
+          </div>
+        </div>
+        <div className="track"><div className="track-fill" style={{width: pct+'%'}}></div></div>
+      </div>
+
+      <div className="tabs">
+        <button className={"tab" + (tab==='checklist'?' active':'')} onClick={()=>setTab('checklist')}>Checklist</button>
+        <button className={"tab" + (tab==='roadmap'?' active':'')} onClick={()=>setTab('roadmap')}>Roadmap</button>
+      </div>
+
+      {tab==='checklist' && (
+        <div>
+          <div className="edit-toggle-row">
+            <button className={"edit-toggle" + (editMode? " on":"")} onClick={()=>setEditMode(e=>!e)}>
+              {editMode ? "✓ Done editing" : "✎ Edit modules & topics"}
+            </button>
+          </div>
+          {subjectData.modules.length === 0 && (
+            <div className="empty-modules">No modules yet — turn on editing above to add your first one.</div>
+          )}
+          {subjectData.modules.map(mod=>(
+            <Module key={mod.key} mod={mod} done={done} editMode={editMode} openKey={openKey} setOpenKey={setOpenKey}
+              onToggleItem={onToggleItem} onDeleteModule={onDeleteModule} onRenameModule={onRenameModule}
+              onAddItem={onAddItem} onDeleteItem={onDeleteItem} onRenameItem={onRenameItem} onUpdateHrs={onUpdateHrs}/>
+          ))}
+          {editMode && <AddModuleRow onAdd={onAddModule}/>}
+        </div>
+      )}
+
+      {tab==='roadmap' && (
+        days.length ? (
+          <div>
+            <p className="roadmap-intro">Auto-built from this subject's topics, in order, capped at {MAX_HOURS_PER_DAY} hours a day — never more. Tap a day to open its tasks and check them off. Turn on editing to force an earlier split on any day.</p>
+            <div className="edit-toggle-row">
+              <button className={"edit-toggle" + (editRoadmap? " on":"")} onClick={()=>setEditRoadmap(e=>!e)}>
+                {editRoadmap ? "✓ Done editing" : "✎ Edit roadmap"}
+              </button>
+            </div>
+            <div className="path-wrap">
+              {days.map((d,idx)=>(
+                <DayNode key={d.n} day={d} done={done} toggle={onToggleItem} isLast={idx===days.length-1}
+                  openDay={openDay} setOpenDay={setOpenDay} editRoadmap={editRoadmap} breakSet={breakSet} onToggleBreak={onToggleBreak}/>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="empty-subject">No topics yet for this subject — add some in the Checklist tab and a roadmap will build itself here automatically.</div>
+        )
+      )}
+      </React.Fragment>
+      )}
+
+      <p className="footer-note">Progress and structure live in one shared database — open this same file from any device to see it.</p>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
